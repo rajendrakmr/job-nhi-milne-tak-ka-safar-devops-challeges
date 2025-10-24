@@ -1,0 +1,44 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: blue-deployment
+  namespace: nodejs
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nodejs-app
+      version: blue
+  template:
+    metadata:
+      labels:
+        app: nodejs-app 
+        version: blue 
+    spec:
+      containers:
+        - name: blue-container
+          image: rk0617/nodeapp-mini:v1.1.0
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              cpu: 64m
+              memory: 100Mi
+            limits:
+              cpu: 128m
+              memory: 200Mi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            timeoutSeconds: 5 

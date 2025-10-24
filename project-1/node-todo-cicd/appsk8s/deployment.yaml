@@ -1,0 +1,48 @@
+kind: Deployment 
+apiVersion: apps/v1 
+metadata:
+  name: nodejs-deploy 
+  namespace: nodejs
+  labels:
+    app: nodejs-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nodejsapp
+  template:
+    metadata:
+      labels:
+        app: nodejsapp
+    spec:
+      containers:
+        - name: nodejs-container
+          image: rk0617/nodeapp-mini:v1.1.0
+          resources:
+            requests:
+              cpu: 64m
+              memory: 100Mi
+            limits:
+              cpu: 128m
+              memory: 200Mi
+          livenessProbe:
+            httpGet:
+              path: /health       # The health check endpoint we added
+              port: 8000
+            initialDelaySeconds: 10  # Wait before first check
+            periodSeconds: 15        # Check every 15 seconds
+            timeoutSeconds: 5        # Timeout for each check
+            failureThreshold: 3      # Mark container unhealthy after 3 failures
+          readinessProbe:
+            httpGet:
+              path: /health       # The health check endpoint we added
+              port: 8000
+            initialDelaySeconds: 10  # Wait before first check
+            periodSeconds: 15        # Check every 15 seconds
+            timeoutSeconds: 5        # Timeout for each check
+          
+
+
+
+
+  
