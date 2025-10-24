@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: noteapp
+  namespace: noteapp-ns
+  labels:
+    app: noteapp
+spec:
+  selector:
+    matchLabels:
+      app: noteapp
+  template:
+    metadata:
+      labels:
+        app: noteapp
+    spec:
+      containers:
+        - name: noteapp
+          image: rk0617/noteapp:latest
+          ports:
+            - containerPort: 8000
+      resources:
+        requests:
+          memory: "512Mi"
+          cpu: "250m"
+        limits:
+          memory: "1Gi"
+          cpu: "500m"
