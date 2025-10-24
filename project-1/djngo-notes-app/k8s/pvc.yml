@@ -1,0 +1,12 @@
+kind: PersistentVolumeClaim 
+apiVersion: v1 
+metadata:
+  name: mysql-vpc 
+  namespace: noteapp-ns
+spec:
+  storageClassName: standard
+  accessModes: 
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi

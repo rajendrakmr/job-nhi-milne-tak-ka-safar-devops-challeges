@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: noteapp-mysql
+  namespace: noteapp-ns
+  labels:
+    app: mysql
+spec:
+  selector:
+    matchLabels:
+      app: noteapp-mysql
+  serviceName: mysql-service
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: noteapp-mysql
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:latest
+        ports:
+        - containerPort: 3306
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysecret
+              key: MYSQL_ROOT_PASSWORD  # Secret for the root password
+        - name: MYSQL_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              name: configmap  # ConfigMap for the database name
+              key: MYSQL_DATABASE
+        volumeMounts:
+        - name: mysql-data
+          mountPath: /mnt/mysql-data  # Volume mount path for MySQL data
+  volumeClaimTemplates:
+  - metadata:
+      name: mysql-data
+    spec:
+      storageClassName: standard  # Ensure 'standard' storage class exists
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi  # Requesting 1Gi of storage for each replica
