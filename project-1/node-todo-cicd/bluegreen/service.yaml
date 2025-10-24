@@ -1,0 +1,17 @@
+kind: Service
+apiVersion: v1 
+metadata:
+  name: nodejs-svc 
+  namespace: nodejs 
+spec:
+  selector:
+    app: nodejs-app
+    version: blue
+  ports:
+    - protocol: TCP 
+      port: 8000
+      targetPort: 8000
+
+      # kubectl get namespace nodejs -o json > tmp.json
+      # kubectl replace --raw "/api/v1/namespaces/nodejs/finalize" -f tmp.json
+

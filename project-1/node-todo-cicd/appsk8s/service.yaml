@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: nodejs-svc 
+  namespace: nodejs 
+
+spec:
+  selector:
+    app: nodejsapp
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+      # nodePort: 31800

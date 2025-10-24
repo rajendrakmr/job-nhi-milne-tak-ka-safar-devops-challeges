@@ -1,28 +1,108 @@
 <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit <%- todo %></title>
+    <style>
+      body {
+        font-family: "Segoe UI", Roboto, sans-serif;
+        background: #f4f6f8;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
 
-<html>
+      .container {
+        background: white;
+        padding: 2rem 3rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        width: 350px;
+      }
 
-    <head>
-        <title>Edit <%- todo %></title>
-        <style>
-            a {
-                text-decoration: none;
-                color: black;
-            }
+      h1 {
+        color: #333;
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+      }
 
-        </style>
-    </head>
+      label {
+        display: block;
+        font-weight: 600;
+        color: #444;
+        margin-bottom: 0.5rem;
+      }
 
-    <body>
-        <h1>Edit <%- todo %>:</h1>
-        <form action="/todo/edit/<%= todoIdx %>" method="post">
-            <p>
-                <label for="editTodo">Change to:</label>
-                <input type="hidden" name="_method" value="PUT">
-                <input type="text" name="editTodo" id="editTodo" autofocus placeholder="<%- todo %>" />
-                <input type="submit" value="Save" />
-            </p>
-        </form>
-    </body>
+      input[type="text"] {
+        width: 100%;
+        padding: 0.6rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        transition: all 0.2s ease-in-out;
+      }
 
+      input[type="text"]:focus {
+        outline: none;
+        border-color: #0078ff;
+        box-shadow: 0 0 4px rgba(0, 120, 255, 0.4);
+      }
+
+      input[type="submit"] {
+        background-color: #0078ff;
+        color: white;
+        border: none;
+        padding: 0.6rem 1.5rem;
+        font-size: 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out;
+      }
+
+      input[type="submit"]:hover {
+        background-color: #005ec4;
+      }
+
+      a {
+        display: inline-block;
+        margin-top: 1rem;
+        text-decoration: none;
+        color: #0078ff;
+        font-weight: 500;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Edit Task</h1>
+      <form action="/todo/edit/<%= todoIdx %>" method="post">
+        <input type="hidden" name="_method" value="PUT" />
+
+        <label for="editTodo">Change "<%- todo %>" to:</label>
+        <input
+          type="text"
+          name="editTodo"
+          id="editTodo"
+          value="<%- todo %>"
+          placeholder="Enter new task"
+          autofocus
+          required
+        />
+
+        <input type="submit" value="Save Changes" />
+      </form>
+
+      <a href="/todo">← Back to List</a>
+    </div>
+  </body>
 </html>
