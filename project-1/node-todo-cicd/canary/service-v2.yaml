@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: canary-deploy-svc
+  namespace: nodejs 
+spec:
+  selector:
+    app: canarymyapp
+  ports:
+  - port: 8000
+    targetPort: 8000
+    protocol: TCP

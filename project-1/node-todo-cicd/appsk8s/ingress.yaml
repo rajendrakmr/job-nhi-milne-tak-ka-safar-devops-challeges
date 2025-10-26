@@ -17,9 +17,9 @@ spec:
                 name: nodejs-svc
                 port:
                   number: 8000
-          - path: /nginx
-            pathType:
-              service:
-                name: nginx-svc
-                port:
-                  number: 80
+          # - path: /nginx
+          #   pathType:
+          #     service:
+          #       name: nginx-svc
+          #       port:
+          #         number: 80

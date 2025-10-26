@@ -5,14 +5,14 @@
         "annotations": {
             "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Namespace\",\"metadata\":{\"annotations\":{},\"name\":\"nodejs\"}}\n"
         },
-        "creationTimestamp": "2025-10-24T06:15:38Z",
-        "deletionTimestamp": "2025-10-24T07:06:59Z",
+        "creationTimestamp": "2025-10-24T07:10:03Z",
+        "deletionTimestamp": "2025-10-25T05:40:06Z",
         "labels": {
             "kubernetes.io/metadata.name": "nodejs"
         },
         "name": "nodejs",
-        "resourceVersion": "23266",
-        "uid": "9c521047-e3f7-4bb3-8a9d-63818c9a22ab"
+        "resourceVersion": "98148",
+        "uid": "aba06ace-25dd-423e-8462-5dd267e0aeaf"
     },
     "spec": {
         "finalizers": []
@@ -20,35 +20,35 @@
     "status": {
         "conditions": [
             {
-                "lastTransitionTime": "2025-10-24T07:07:04Z",
+                "lastTransitionTime": "2025-10-25T05:40:11Z",
                 "message": "Discovery failed for some groups, 1 failing: unable to retrieve the complete list of server APIs: metrics.k8s.io/v1beta1: stale GroupVersion discovery: metrics.k8s.io/v1beta1",
                 "reason": "DiscoveryFailed",
                 "status": "True",
                 "type": "NamespaceDeletionDiscoveryFailure"
             },
             {
-                "lastTransitionTime": "2025-10-24T07:07:04Z",
+                "lastTransitionTime": "2025-10-25T05:40:11Z",
                 "message": "All legacy kube types successfully parsed",
                 "reason": "ParsedGroupVersions",
                 "status": "False",
                 "type": "NamespaceDeletionGroupVersionParsingFailure"
             },
             {
-                "lastTransitionTime": "2025-10-24T07:07:04Z",
+                "lastTransitionTime": "2025-10-25T05:40:11Z",
                 "message": "All content successfully deleted, may be waiting on finalization",
                 "reason": "ContentDeleted",
                 "status": "False",
                 "type": "NamespaceDeletionContentFailure"
             },
             {
-                "lastTransitionTime": "2025-10-24T07:07:04Z",
+                "lastTransitionTime": "2025-10-25T05:40:11Z",
                 "message": "All content successfully removed",
                 "reason": "ContentRemoved",
                 "status": "False",
                 "type": "NamespaceContentRemaining"
             },
             {
-                "lastTransitionTime": "2025-10-24T07:07:04Z",
+                "lastTransitionTime": "2025-10-25T05:40:11Z",
                 "message": "All content-preserving finalizers finished",
                 "reason": "ContentHasNoFinalizers",
                 "status": "False",
