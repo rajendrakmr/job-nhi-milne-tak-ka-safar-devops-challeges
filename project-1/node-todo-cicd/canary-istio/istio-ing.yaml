@@ -1,0 +1,21 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: myapp-gateway
+  namespace: nodejs
+spec:
+  selector:
+    istio: ingressgateway  # selects Istio ingress controller
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+        # number: 443
+        # name: https
+        # protocol: HTTPS
+      # tls:
+      #   mode: SIMPLE
+      #   credentialName: node-tls   # <-- your secret goes here
+      hosts:
+        - node.hicloud.co.in

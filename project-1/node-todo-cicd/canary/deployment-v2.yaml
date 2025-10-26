@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: canary-nodejs-deployment
+  namespace: nodejs
+spec:
+  selector:
+    matchLabels:
+      app: canarymyapp
+      version: canary 
+  template:
+    metadata:
+      labels:
+        app: canarymyapp
+        version: canary 
+    spec:
+      containers:
+      - name: myapp
+        image: rk0617/nodeapp-mini:v2.3.0
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+          requests:
+            memory: "64Mi"
+            cpu: "200m"
+        ports:
+        - containerPort: 8000

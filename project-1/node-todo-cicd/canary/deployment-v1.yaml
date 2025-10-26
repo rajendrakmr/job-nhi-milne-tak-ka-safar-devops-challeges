@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stable-nodejs-deployment
+  namespace: nodejs
+spec:
+  selector:
+    matchLabels:
+      app: stablemyapp
+      version: stable 
+  template:
+    metadata:
+      labels:
+        app: stablemyapp
+        version: stable 
+    spec:
+      containers:
+      - name: myapp
+        image: rk0617/nodeapp-mini:v1.1.0
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+          requests:
+            memory: "64Mi"
+            cpu: "200m"
+        ports:
+        - containerPort: 8000
