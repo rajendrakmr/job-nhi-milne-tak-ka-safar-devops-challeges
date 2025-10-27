@@ -1,0 +1,140 @@
+
+ 
+ # ----------------------
+# 1️⃣ Stable Deployment (v1)
+# ----------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stable-deploy
+  namespace: nodejs
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: web
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: web
+        version: v1
+    spec:
+      containers:
+      - name: stable
+        image: rk0617/nodeapp-mini:v1.1.0
+        ports:
+        - containerPort: 8000
+
+---
+# ----------------------
+# 2️⃣ Canary Deployment (v2)
+# ----------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: canary-deploy
+  namespace: nodejs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: web
+        version: v2
+    spec:
+      containers:
+      - name: canary
+        image: rk0617/nodeapp-mini:v2.3.0
+        ports:
+        - containerPort: 8000
+
+---
+# ----------------------
+# 3️⃣ Shared Service
+# ----------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  namespace: nodejs
+spec:
+  selector:
+    app: web
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 8000
+
+---
+# ----------------------
+# 4️⃣ Istio Gateway
+# ----------------------
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: myapp-gateway
+  namespace: nodejs
+spec:
+  selector:
+    istio: ingress
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "myapp.local"
+
+---
+# ----------------------
+# 5️⃣ DestinationRule with subsets
+# ----------------------
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: web
+  namespace: nodejs
+spec:
+  host: web.nodejs.svc.cluster.local
+  subsets:
+    - name: v1
+      labels:
+        version: v1
+    - name: v2
+      labels:
+        version: v2
+  trafficPolicy:
+    loadBalancer:
+      consistentHash:
+        httpCookie:
+          name: canary
+          ttl: 1h
+
+
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: web
+  namespace: nodejs
+spec:
+  hosts:
+  - "myapp.local"
+  gateways:
+  - myapp-gateway
+  http:
+  - route:
+      - destination:
+          host: web.nodejs.svc.cluster.local
+          subset: v1
+        weight: 50
+      - destination:
+          host: web.nodejs.svc.cluster.local
+          subset: v2
+        weight: 50
+ 
