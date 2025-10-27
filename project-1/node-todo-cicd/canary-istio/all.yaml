@@ -1,7 +1,16 @@
+# ----------------------
+# 1️⃣ Namespace
+# ----------------------
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nodejs
+  labels:
+    istio-injection: enabled
 
- 
- # ----------------------
-# 1️⃣ Stable Deployment (v1)
+---
+# ----------------------
+# 2️⃣ Stable Deployment (v1)
 # ----------------------
 apiVersion: apps/v1
 kind: Deployment
@@ -28,7 +37,7 @@ spec:
 
 ---
 # ----------------------
-# 2️⃣ Canary Deployment (v2)
+# 3️⃣ Canary Deployment (v2)
 # ----------------------
 apiVersion: apps/v1
 kind: Deployment
@@ -55,7 +64,7 @@ spec:
 
 ---
 # ----------------------
-# 3️⃣ Shared Service
+# 4️⃣ Shared Service
 # ----------------------
 apiVersion: v1
 kind: Service
@@ -72,7 +81,46 @@ spec:
 
 ---
 # ----------------------
-# 4️⃣ Istio Gateway
+# 5️⃣ Cert-Manager ClusterIssuer (Let's Encrypt)
+# ----------------------
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    email: rajendraakmr@gmail.com    
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    solvers:
+    - http01:
+        ingress:
+          class: istio
+
+---
+# ----------------------
+# 6️⃣ SSL Certificate for demo.hrcloud.in
+# ----------------------
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: myapp-cert
+  namespace: nodejs
+spec:
+  secretName: myapp-tls
+  duration: 2160h # 90 days
+  renewBefore: 360h # 15 days
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  commonName: demo.hrcloud.in
+  dnsNames:
+  - demo.hrcloud.in
+
+---
+# ----------------------
+# 7️⃣ Istio Gateway (HTTP + HTTPS)
 # ----------------------
 apiVersion: networking.istio.io/v1beta1
 kind: Gateway
@@ -88,11 +136,22 @@ spec:
       name: http
       protocol: HTTP
     hosts:
-    - "myapp.local"
+    - "demo.hrcloud.in"
+    tls:
+      httpsRedirect: true   # Redirect HTTP → HTTPS
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    hosts:
+    - "demo.hrcloud.in"
+    tls:
+      mode: SIMPLE
+      credentialName: myapp-tls   # 👈 Same secret name as Certificate spec.secretName
 
 ---
 # ----------------------
-# 5️⃣ DestinationRule with subsets
+# 8️⃣ DestinationRule (Sticky Cookie)
 # ----------------------
 apiVersion: networking.istio.io/v1beta1
 kind: DestinationRule
@@ -115,8 +174,10 @@ spec:
           name: canary
           ttl: 1h
 
-
 ---
+# ----------------------
+# 9️⃣ VirtualService (50-50 Canary Split)
+# ----------------------
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
@@ -124,7 +185,7 @@ metadata:
   namespace: nodejs
 spec:
   hosts:
-  - "myapp.local"
+  - "demo.hrcloud.in"
   gateways:
   - myapp-gateway
   http:
@@ -137,4 +198,3 @@ spec:
           host: web.nodejs.svc.cluster.local
           subset: v2
         weight: 50
- 
