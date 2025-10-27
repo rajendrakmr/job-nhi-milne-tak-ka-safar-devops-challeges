@@ -1,0 +1,139 @@
+# 1. Namespace
+# apiVersion: v1
+# kind: Namespace
+# metadata:
+#   name: local-ns
+---
+# 2. Apache Deployment (v1)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apache-v1
+  namespace: local-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: web
+        version: v1
+    spec:
+      containers:
+        - name: apache
+          image: httpd
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+            requests:
+              memory: "64Mi"
+              cpu: "200m"
+---
+# 3. Nginx Deployment (v2)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-v2
+  namespace: local-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: web
+        version: v2
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+            requests:
+              memory: "64Mi"
+              cpu: "200m"
+---
+# 4. Common Service (for Istio target)
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  namespace: local-ns
+spec:
+  selector:
+    app: web
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+---
+# 5. Istio Gateway (HTTP)
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: myapp-gateway
+  namespace: local-ns
+spec: 
+  selector:
+    istio: ingress
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - "myapp.local"
+---
+# 6. VirtualService (traffic split 50/50)
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: web
+  namespace: local-ns
+spec:
+  hosts:
+    - "myapp.local"
+  gateways:
+    - myapp-gateway
+  http:
+    - route:
+        - destination:
+            host: web.local-ns.svc.cluster.local
+            subset: v1
+          weight: 50
+        - destination:
+            host: web.local-ns.svc.cluster.local
+            subset: v2
+          weight: 50
+---
+# 7. DestinationRule for subsets
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: web
+  namespace: local-ns
+spec:
+  host: web.local-ns.svc.cluster.local
+  subsets:
+    - name: v1
+      labels:
+        version: v1
+    - name: v2
+      labels:
+        version: v2
+
