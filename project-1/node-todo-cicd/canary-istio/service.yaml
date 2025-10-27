@@ -10,3 +10,6 @@ spec:
   - port: 8000
     targetPort: 8000
     protocol: TCP
+# kubectl port-forward svc/web -n local-ns 8080:80 --address=0.0.0.0
+# kubectl get svc -n istio-system
+# kubectl port-forward svc/istio-ingress -n istio-system 8080:80 --address=0.0.0.0
