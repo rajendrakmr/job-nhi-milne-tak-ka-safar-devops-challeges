@@ -97,7 +97,7 @@ spec:
         name: http
         protocol: HTTP
       hosts:
-        - "myapp.local"
+        - "demo.hicloud.co.in"
 ---
 # 6. VirtualService (traffic split 50/50)
 apiVersion: networking.istio.io/v1beta1
@@ -107,7 +107,7 @@ metadata:
   namespace: local-ns
 spec:
   hosts:
-    - "myapp.local"
+    - "demo.hicloud.co.in"
   gateways:
     - myapp-gateway
   http:
