@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+  labels:
+    app: api-gateway
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+        - name: api-gateway
+          image: rk0617/api-gateway:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: PRODUCTS_URL
+              value: "http://products:8002"
+            # - name: SHOPPING_URL
+            #   value: "http://shopping:8003"
+            - name: CUSTOMER_URL
+              value: "http://customer:8001"
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"

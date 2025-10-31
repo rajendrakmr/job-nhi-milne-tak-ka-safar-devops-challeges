@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: customer
+  namespace: dev
+  labels:
+    app: customer
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: customer
+  template:
+    metadata:
+      labels:
+        app: customer
+    spec:
+      containers:
+        - name: customer
+          image: rk0617/customer:latest
+          ports:
+            - containerPort: 8001
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: MONGO_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret
+                  key: mongo-user
+            - name: MONGO_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret
+                  key: mongo-password
+            - name: APP_SECRET
+              value: "supersecret"
+            - name: PORT
+              value: "8001"
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              export MONGODB_URI="mongodb://${MONGO_USER}:${MONGO_PASS}@mongo:27017/customerdb?authSource=admin";
+              echo "✅ Mongo URL = $MONGODB_URI";
+              exec npm start;
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
