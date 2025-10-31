@@ -1,0 +1,166 @@
+# version: "3.8"
+
+# services:
+#   nosql-db:
+#     image: mongo:5
+#     container_name: nosql-db
+#     restart: always
+#     ports:
+#       - "27018:27017"
+#     volumes:
+#       - mongo_data1:/data/db    # ✅ Persistent MongoDB data
+#     networks:
+#       - microservice_net
+
+#   customer:
+#     build: ./customer
+#     container_name: customer
+#     ports:
+#       - "8001:8001"
+#     env_file: ./customer/.env.dev
+#     depends_on:
+#       - nosql-db
+#     networks:
+#       - microservice_net
+
+#   products:
+#     build: ./products
+#     container_name: products
+#     ports:
+#       - "8002:8002"
+#     env_file: ./products/.env.dev
+#     depends_on:
+#       - nosql-db
+#     networks:
+#       - microservice_net 
+#     volumes:
+#       - ./products/uploads:/app/uploads
+
+
+#   shopping:
+#     build: ./shopping
+#     container_name: shopping
+#     ports:
+#       - "8003:8003"
+#     env_file: ./shopping/.env.dev
+#     depends_on:
+#       - products
+#       - nosql-db
+#     networks:
+#       - microservice_net
+
+#   proxy:
+#     build: ./proxy
+#     container_name: proxy
+#     ports:
+#       - "8080:80"
+#     depends_on:
+#       - customer
+#       - products
+#       - shopping
+#     networks:
+#       - microservice_net
+
+# # ✅ Define persistent volume for MongoDB
+# volumes:
+#   mongo_data1:
+
+# # ✅ Define shared network for all services
+# networks:
+#   microservice_net:
+#     driver: bridge
+
+
+version: "3.8"
+
+services:
+  # ==========================
+  # 🗃️ MongoDB
+  # ==========================
+  nosql-db:
+    image: mongo:5
+    container_name: nosql-db
+    restart: always
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo_data1:/data/db
+    networks:
+      - microservice_net
+
+  # ==========================
+  # 👤 Customer Service
+  # ==========================
+  customer:
+    build: ./customer
+    container_name: customer
+    ports:
+      - "8001:8001"
+    env_file: ./customer/.env.dev
+    depends_on:
+      - nosql-db
+    networks:
+      - microservice_net
+
+  # ==========================
+  # 📦 Products Service
+  # ==========================
+  products:
+    build: ./products
+    container_name: products
+    ports:
+      - "8002:8002"
+    env_file: ./products/.env.dev
+    depends_on:
+      - nosql-db
+    networks:
+      - microservice_net
+    volumes:
+      # ✅ share uploaded images with host (persistent)
+      - ./products/uploads:/app/uploads
+    #  - ./products/uploads:/app/uploads  
+
+  # ==========================
+  # 🛒 Shopping Service
+  # ==========================
+  shopping:
+    build: ./shopping
+    container_name: shopping
+    ports:
+      - "8003:8003"
+    env_file: ./shopping/.env.dev
+    depends_on:
+      - products
+      - nosql-db
+    networks:
+      - microservice_net
+
+  # ==========================
+  # 🚪 API Gateway (New)
+  # ==========================
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    env_file: ./api-gateway/.env
+    depends_on:
+      - customer
+      - products
+      - shopping
+    networks:
+      - microservice_net
+
+# ==========================
+# 📦 Volumes
+# ==========================
+volumes:
+  mongo_data1:
+
+# ==========================
+# 🌐 Network
+# ==========================
+networks:
+  microservice_net:
+    driver: bridge
+

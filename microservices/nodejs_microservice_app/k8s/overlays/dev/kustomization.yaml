@@ -1,0 +1,31 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: dev
+
+resources:
+  - ../../base/mongo
+  - ../../base/products
+  - ../../base/customer
+  # # - ../../base/shopping
+  - ../../base/api-gateway
+  - ../../base/frontend
+  - ../../base/ingress
+  - ../../secrets
+
+configMapGenerator:
+  - name: common-env
+    envs:
+      - configmap.env
+
+images:
+  - name: rk0617/products
+    newTag: latest
+  - name: rk0617/customer
+    newTag: latest
+  # - name: rk0617/shopping
+  #   newTag: dev
+  - name: rk0617/api-gateway
+    newTag: latest
+  - name: rk0617/frontend
+    newTag: latest
