@@ -1,0 +1,35 @@
+# overlays/dev/ing-backend-patch.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api-ing-svc
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+    - host: api.dev.myapp.local
+      http:
+        paths:
+          - path: /api(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 8080
+
+          - path: /customers(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: customer
+                port:
+                  number: 8001
+
+          - path: /products(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: products
+                port:
+                  number: 8002
