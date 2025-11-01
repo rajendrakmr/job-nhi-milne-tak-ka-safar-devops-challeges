@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: myapp-tls
+spec:
+  secretName: myapp-tls
+  renewBefore: 720h # 30 days (default)
+  dnsNames:
+    - myapp.local
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
